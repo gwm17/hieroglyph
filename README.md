@@ -86,6 +86,12 @@ This description is for elastic scattering of 16C on deuterium. hieroglyph accep
 
 More will be added (and more information can be found in `hieroglyph/potentials.py`).
 
+Run as 
+
+```bash
+python main.py create config.json
+```
+
 ### parse-elastic
 
 Takes in a PTOLEMY elastic scattering calculation output and converts it into a numpy (.npz) file containing the following arrays:
@@ -94,6 +100,12 @@ Takes in a PTOLEMY elastic scattering calculation output and converts it into a 
 - `cross`: The center-of-mass differential cross section
 
 Note that the indicies correlate between the two arrays (i.e. `angle[0]` is the angle of `cross[0]`).
+
+Run as
+
+```bash
+python main.py parse-elastic ptolemy_output parsed_numpy.npz
+```
 
 ### parse-dwba
 
@@ -109,6 +121,12 @@ Note that the indicies correlate in the following way:
 - `angle[0]` is the angle of `cross[0]`
 - `l_values[0]` is the l of `cross_ls[0, :]`
 - `angle_[0]` is the angle of `cross_ls[*, 0]`
+
+Run as
+
+```bash
+python main.py parse-dwba ptolemy_output parsed_numpy.npz
+```
 
 ## Requirements
 

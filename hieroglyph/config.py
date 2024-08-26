@@ -17,6 +17,45 @@ class NucleusParameters:
 
 @dataclass
 class Config:
+    """Defines an input configuration to hieroglyph's create
+
+    Attributes
+    ----------
+    ptolemy_config_path: str
+        The path to the PTOLEMY input file that will be created
+    target: NucleusParameters
+        Parameters for the target nucleus
+    projectile: NucleusParameters
+        Parameters for the projectile nucleus
+    ejectile: NucleusParameters
+        Parameters for the ejectile nucleus
+    residual: NucleusParameters
+        Parameters for the residual nucleus
+    projectile_energy: float
+        The kinetic energy of the projectile (beam energy) in MeV
+    incoming_potential: str
+        The optical model potential for the incoming channel
+    outgoing_potential: str
+        The optical model potential for the outgoing channel
+    orbital_n: int
+        The n value of the populated oribital
+    orbital_l: int
+        The l value of the populated orbital
+    orbital_j: int
+        The j value of the populated orbital
+    angle_min: float
+        The minimum angle to calculate (degerees)
+    angle_max: float
+        The maximum angle to calculate (degrees)
+    angle_step: float
+        The angle step size (degrees)
+
+    Methods
+    -------
+    sanitize(nuc_map)
+        Convert the config from inverse kinematics to normal kinematics
+    """
+
     ptolemy_config_path: str = "Invalid"
     target: NucleusParameters = field(default_factory=lambda: NucleusParameters())
     projectile: NucleusParameters = field(default_factory=lambda: NucleusParameters())
@@ -33,7 +72,16 @@ class Config:
     angle_step: float = 0.0
 
     def sanitize(self, nuc_map: NuclearDataMap):
-        """Convert inverse kinematics to normal kinematics"""
+        """Convert inverse kinematics to normal kinematics
+
+        If the configuration is already in normal kinematics,
+        nothing happens.
+
+        Parameters
+        ----------
+        nuc_map: spyral_utils.nuclear.NuclearDataMap
+            The map of nucleus masses
+        """
         if self.target.a < self.projectile.a:
             orig_target = self.target
             orig_proj = self.projectile
@@ -53,6 +101,18 @@ class Config:
 
 
 def deserialize_config(path: Path) -> Config:
+    """Deserialize a configuration from a JSON file
+
+    Parameters
+    ----------
+    path: Path
+        The path to the JSON file
+
+    Returns
+    -------
+    Config
+        The parsed configuration
+    """
     config = Config()
     with open(path, "r") as input_path:
         json_data = load(input_path)

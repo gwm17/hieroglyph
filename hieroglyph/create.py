@@ -13,6 +13,19 @@ def create_elastic_scattering_input(
     projectile: NucleusData,
     output: TextIOWrapper,
 ):
+    """Generate a PTOLEMY input for elastic scattering reactions
+
+    Parameters
+    ----------
+    config: Config
+        The hieroglyph configuration
+    target: spyral_utils.nuclear.NucleusData
+        The target nucleus
+    projectile: spyral_utils.nuclear.NucleusData
+        The projectile nucleus
+    output: TextIOWrapper
+        The handle to the file to be written to
+    """
     potential = create_parameters(
         config.projectile_energy,
         config.target.z,
@@ -41,7 +54,19 @@ def create_inelastic_scattering_input(
     projectile: NucleusData,
     output: TextIOWrapper,
 ):
+    """Generate a PTOLEMY input for inelastic scattering reactions
 
+    Parameters
+    ----------
+    config: Config
+        The hieroglyph configuration
+    target: spyral_utils.nuclear.NucleusData
+        The target nucleus
+    projectile: spyral_utils.nuclear.NucleusData
+        The projectile nucleus
+    output: TextIOWrapper
+        The handle to the file to be written to
+    """
     potential_in = create_parameters(
         config.projectile_energy,
         config.target.z,
@@ -85,6 +110,23 @@ def create_transfer_input(
     residual: NucleusData,
     output: TextIOWrapper,
 ):
+    """Generate a PTOLEMY input for transfer reactions
+
+    Parameters
+    ----------
+    config: Config
+        The hieroglyph configuration
+    target: spyral_utils.nuclear.NucleusData
+        The target nucleus
+    projectile: spyral_utils.nuclear.NucleusData
+        The projectile nucleus
+    ejectile: spyral_utils.nuclear.NucleusData
+        The ejectile nucleus
+    residual: spyral_utils.nuclear.NucleusData
+        The residual nucleus
+    output: TextIOWrapper
+        The handle to the file to be written to
+    """
     Q = (
         target.mass
         + projectile.mass
@@ -163,6 +205,17 @@ def create_transfer_input(
 
 
 def create_input(path: Path):
+    """From a hieroglyph JSON file, create a PTOLEMY input file
+
+    Auto-detects whether the configuration is for elastic,
+    inelastic, or transfer and calls the appropriate
+    function.
+
+    Parameters
+    ----------
+    path: Path
+        The path to the JSON configuration file
+    """
     if not path.exists():
         raise Exception(f"Configuration path {path} does not exist!")
 
@@ -177,7 +230,6 @@ def create_input(path: Path):
     ptolemy_path = Path(config.ptolemy_config_path)
 
     with open(ptolemy_path, "w") as ptolemy_config:
-
         if projectile.Z == ejectile.Z and projectile.A == ejectile.A:
             # Check both case of normal and inverse kinematic inelastic
             if config.residual.excitation == 0.0:

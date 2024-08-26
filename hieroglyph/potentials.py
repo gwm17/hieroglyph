@@ -1,6 +1,7 @@
 import math
 from typing import Callable
 
+# Keyword for each potential
 AN_CAI = "an-cai"
 DAEHNICK = "daehnick"
 BOJOWALD = "bojowald"
@@ -8,6 +9,22 @@ KONING_DELAROCHE_PROTON = "koning-delaroche-proton"
 
 
 def an_cai_potential(E: float, zt: int, at: int, params: dict[str, float]):
+    """An-Cai detueron scattering optical model potential
+
+    From  An, H. and Cai, C., "Global deuteron optical model potential for the energy range up to 183 MeV", Phys. Rev. C. 73, 2006
+    https://doi-org.proxy1.cl.msu.edu/10.1103/PhysRevC.73.054605
+
+    Parameters
+    ----------
+    E: float
+        The projectile energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    params: dict[str, float]
+        The dictionary of optical model parameters to be filled out
+    """
     a3 = at ** (0.333)
 
     params["V"] = 91.85 - 0.249 * E + 1.116e-4 * E**2.0 + 0.642 * zt / a3
@@ -29,6 +46,22 @@ def an_cai_potential(E: float, zt: int, at: int, params: dict[str, float]):
 
 
 def daehnick_potential(E: float, zt: int, at: int, params: dict[str, float]):
+    """Daehnick detueron scattering optical model potential
+
+    From  Daehnick, W.W., Childs, J.D., Vrcelj, Z., "Global optical model potential for elastic deuteron scattering from 12 to 90 MeV", Phys. Rev. C. 21, 1980
+    https://doi-org.proxy1.cl.msu.edu/10.1103/PhysRevC.21.2253
+
+    Parameters
+    ----------
+    E: float
+        The projectile energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    params: dict[str, float]
+        The dictionary of optical model parameters to be filled out
+    """
     nt = at - zt
     a3 = at ** (0.333)
     beta = -1.0 * (E * 0.01) ** 2.0
@@ -60,6 +93,22 @@ def daehnick_potential(E: float, zt: int, at: int, params: dict[str, float]):
 
 
 def bojowald_potential(E: float, zt: int, at: int, params: dict[str, float]):
+    """Bojowald detueron scattering optical model potential
+
+    From  Bojowald, J., Machner, et al. "Elastic deuteron scattering adn optical model parameters at energies up to 100 MeV", Phys. Rev. C. 38, 1988
+    https://doi-org.proxy1.cl.msu.edu/10.1103/PhysRevC.38.1153
+
+    Parameters
+    ----------
+    E: float
+        The projectile energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    params: dict[str, float]
+        The dictionary of optical model parameters to be filled out
+    """
     # nt = at - zt
     a3 = at ** (0.333)
 
@@ -84,6 +133,22 @@ def bojowald_potential(E: float, zt: int, at: int, params: dict[str, float]):
 def koning_delaroche_proton_potential(
     E: float, zt: int, at: int, params: dict[str, float]
 ):
+    """Koning-Delaroche proton scattering optical model potential
+
+    From  Koning, A.J., Delaroche, J.P., "Local and global nucleon optical models from 1 keV to 200 MeV", Nuclear Physics A, 713, 2003
+    https://doi.org/10.1016/S0375-9474(02)01321-0
+
+    Parameters
+    ----------
+    E: float
+        The projectile energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    params: dict[str, float]
+        The dictionary of optical model parameters to be filled out
+    """
     nt = at - zt
     a3 = at ** (0.333)
 
@@ -132,6 +197,7 @@ def koning_delaroche_proton_potential(
     params["asoi"] = 0.59
 
 
+# Dictionary connecting each keyword to the function for each potential
 POTENTIALS: dict[str, Callable[[float, int, int, dict[str, float]], None]] = {
     AN_CAI: an_cai_potential,
     DAEHNICK: daehnick_potential,
@@ -141,9 +207,27 @@ POTENTIALS: dict[str, Callable[[float, int, int, dict[str, float]], None]] = {
 
 
 def create_parameters(E: float, zt: int, at: int, potential: str) -> dict[str, float]:
+    """Create the optical model potential parameters
+
+    Parameters
+    ----------
+    E: float
+        The normal kinematics beam energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    potential: str
+        The potential keyword
+
+    Returns
+    -------
+    dict[str, float]
+        A dictionary of optical model parameters
+    """
     if potential not in POTENTIALS.keys():
         raise Exception(
-            f"Potential {potential} is not in the set of allowed Potentials {POTENTIALS}!"
+            f"Potential {potential} is not in the set of allowed Potentials {POTENTIALS.keys()}!"
         )
 
     params = {

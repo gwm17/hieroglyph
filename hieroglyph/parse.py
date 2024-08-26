@@ -1,14 +1,17 @@
 from pathlib import Path
 import numpy as np
 
+# The heinous mess of keylines I use to decide where to parse
 ELASTIC_CS_HEADER = "0    ANGLE          SIGMA/             SIGMA              RUTHERFORD         % PER    % PER"
 ELASTIC_CS_FOOTER = "1                                              P T O L E M Y"
 ELASTIC_CS_FOOTER_ALT = "0TOTAL REACTION CROSS SECTION"
 
+# Ugh
 DWBA_CS_HEADER = "0  C.M.  REACTION     REACTION   LOW L  HIGH L   % FROM"
 DWBA_CS_FOOTER = "1                                                      P T O L E M Y"
 DWBA_CS_FOOTER_ALT = "0TOTAL:"
 
+# Don't even @ me about the LX's
 DWBA_LXS_PER_ROW = 3
 DWBA_HEADER_WORDS_PER_LX = 3
 
@@ -16,6 +19,19 @@ DWBA_HEADER_WORDS_PER_LX = 3
 def parse_elastic_differential_cross_section(
     ptolemy_path: Path, parsed_path: Path
 ) -> None:
+    """Parse the PTOLEMY output of elastic scattering
+
+    Writes the result to a Numpy (.npz) file
+    This is the easy case
+
+    Parameters
+    ----------
+    ptolemy_path: Path
+        Path to the PTOLEMY output
+    parsed_path: Path
+        Path to which the parsed data will be written
+    """
+    # We have no idea how much data there is
     cm_angles = []
     cm_cross = []
 
@@ -24,7 +40,14 @@ def parse_elastic_differential_cross_section(
         idx = 0
         while idx < len(pt_lines):
             cur_line = pt_lines[idx]
-            if cur_line.startswith(ELASTIC_CS_HEADER):
+            # The outputs contain a ton of extra crap
+            # that is good to check, but not relevant for use in experiment
+            # There's no way to know how far to jump to reach the actual
+            # cross section
+            # The cross section is also for some unknowable reason broken into
+            # blocks each with a header and footer. These blocks are not
+            # fixed in size soooooooo we just go until we don't
+            if cur_line.startswith(ELASTIC_CS_HEADER):  # This is objectively bad
                 idx += 2  # Skip current line, next line as headers
                 while not (
                     pt_lines[idx].startswith(ELASTIC_CS_FOOTER)
@@ -50,16 +73,37 @@ def parse_elastic_differential_cross_section(
 def parse_dwba_differential_cross_section(
     ptolemy_path: Path, parsed_path: Path
 ) -> None:
+    """Parse the PTOLEMY output of DWBA scattering
+
+    Writes the result to a Numpy (.npz) file
+    This is the not easy case
+
+    Parameters
+    ----------
+    ptolemy_path: Path
+        Path to the PTOLEMY output
+    parsed_path: Path
+        Path to which the parsed data will be written
+    """
+
+    # We reeaally don't know how much data there is
     cm_angles = []
     cm_cross = []
     cm_cross_ls = None
     l_values = []
     lxs_per_row = []
-    rows_per_line = 0
+    rows_per_line = 0  # Gross
 
     with open(ptolemy_path, "r") as pt_file:
         pt_lines = pt_file.readlines()
         idx = 0
+
+        # The problem with the DWBA output is that in addition to all the madness of
+        # the problems we had with elastic, we now also have the fun of each "output" line
+        # no longer is equivalent to one row of the data table in the file. The lines get too
+        # long and because Fortran sucks they handle this by making a new line underneath with partial
+        # data. This happens for the L-values of the transfer. We need to pre parse these and determine how
+        # many rows go to one line
         while idx < len(pt_lines):
             cur_line = pt_lines[idx]
             if cur_line.startswith(DWBA_CS_HEADER):
@@ -90,7 +134,8 @@ def parse_dwba_differential_cross_section(
             raise Exception("Did not find any lxs while parsing DWBA!")
 
         print(f"Found {sum(lxs_per_row)} lxs: {l_values}")
-
+        # Now that we know how many rows go to a line, parsing is mostly the same as before
+        # except we also need to extract the different Lx's from the table
         while idx < len(pt_lines):
             cur_line = pt_lines[idx]
             if cur_line.startswith(DWBA_CS_HEADER):
