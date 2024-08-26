@@ -1,6 +1,6 @@
 # hieroglyph
 
-hieroglyph is a Python application which provides a clean way to make PTOLEMY files readable and usable for modern applications. hieroglyph can generate a [PTOLEMY](https://www.phy.anl.gov/theory/research/ptolemy/) input based on a JSON configuration and can parse PTOLEMY output files and convert them into numpy (.npz) files. hieroglphy is based upon the digios and Cleopatra codes from ANL. 
+hieroglyph is a Python application which provides a clean way to make PTOLEMY files readable and usable for modern applications. hieroglyph can generate a [PTOLEMY](https://www.phy.anl.gov/theory/research/ptolemy/) input based on a JSON configuration and can parse PTOLEMY output files and convert them into numpy (.npz) files. hieroglphy is based upon the [PtolemyGUI](https://fsunuc.physics.fsu.edu/git/rtang/PtolemyGUI) by R. Tang. 
 
 ## Installation
 
