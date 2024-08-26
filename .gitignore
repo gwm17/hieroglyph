@@ -1,0 +1,8 @@
+*.json
+*.out
+*.txt
+*.npz
+.DS_Store
+.venv
+.vscode
+bin/
