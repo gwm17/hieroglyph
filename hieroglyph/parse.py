@@ -136,6 +136,7 @@ def parse_dwba_differential_cross_section(
         print(f"Found {sum(lxs_per_row)} lxs: {l_values}")
         # Now that we know how many rows go to a line, parsing is mostly the same as before
         # except we also need to extract the different Lx's from the table
+        idx = 0
         while idx < len(pt_lines):
             cur_line = pt_lines[idx]
             if cur_line.startswith(DWBA_CS_HEADER):
@@ -160,7 +161,9 @@ def parse_dwba_differential_cross_section(
                             array_idx = ridx * DWBA_LXS_PER_ROW + i
                             if ridx == 0:
                                 start_idx = 9
-                            cm_cross_ls[array_idx].append(float(entries[start_idx + i]))
+                            cm_cross_ls[array_idx].append(
+                                float(lx_entries[start_idx + i])
+                            )
                     idx += rows_per_line
             else:
                 idx += 1
