@@ -6,6 +6,7 @@ AN_CAI = "an-cai"
 DAEHNICK = "daehnick"
 BOJOWALD = "bojowald"
 KONING_DELAROCHE_PROTON = "koning-delaroche-proton"
+LI_LIANG_CAI_TRITON = "li-liang-cai-triton"
 
 
 def an_cai_potential(E: float, zt: int, at: int, params: dict[str, float]):
@@ -197,12 +198,54 @@ def koning_delaroche_proton_potential(
     params["asoi"] = 0.59
 
 
+def li_liang_cai_triton_potential(E: float, zt: int, at: int, params: dict[str, float]):
+    """Global triton optical model potential
+
+    From: Li, Liang, Cai, (2007) E < 40 | All masses | 48 < A < 232 | Tritons
+    Parameters
+    ----------
+    E: float
+        The projectile energy in MeV
+    zt: int
+        The target Z
+    at: int
+        The target A
+    params: dict[str, float]
+        The dictionary of optical model parameters to be filled out
+    """
+    nt = at - zt
+    a3 = at ** (1.0 / 3.0)
+    
+    params["V"] = 137.6 - 0.1456 * E + 0.0436 * E**2 + 4.3751 * (nt - zt) / at + 1.0474 * zt / a3
+    params["r0"] = 1.1201 - 0.1504 / a3
+    params["a"] = 0.6833 + 0.0191 * a3
+
+    params["Vi"] = 7.383 + 0.5025 * E - 0.0097 * E**2
+    params["ri0"] = 1.3202 - 0.1776 / a3
+    params["ai"] = 1.119 + 0.01913 * a3
+
+    params["Vsi"] = 37.06 - 0.6451 * E - 47.19 * (nt - zt) / at
+    params["rsi0"] = 1.251 - 0.4622 / a3
+    params["asi"] = 0.8114 + 0.01159 * a3
+
+    params["Vso"] = 1.9029
+    params["rso0"] = 0.46991 + 0.1294 / a3
+    params["aso"] = 0.3545 - 0.0522 * a3
+
+    params["Vsoi"] = 0.0
+    params["rsoi0"] = 0.0
+    params["asoi"] = 0.0
+
+    params["rc0"] = 1.422
+
+
 # Dictionary connecting each keyword to the function for each potential
 POTENTIALS: dict[str, Callable[[float, int, int, dict[str, float]], None]] = {
     AN_CAI: an_cai_potential,
     DAEHNICK: daehnick_potential,
     BOJOWALD: bojowald_potential,
     KONING_DELAROCHE_PROTON: koning_delaroche_proton_potential,
+    LI_LIANG_CAI_TRITON: li_liang_cai_triton_potential,
 }
 
 
